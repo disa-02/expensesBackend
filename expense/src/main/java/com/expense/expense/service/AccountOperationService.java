@@ -2,11 +2,15 @@ package com.expense.expense.service;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collector;
 import java.util.stream.Collectors;
@@ -14,6 +18,7 @@ import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.expense.expense.dto.ExpensesByMonthDto;
 import com.expense.expense.dto.OperationAddDto;
 import com.expense.expense.dto.OperationDto;
 import com.expense.expense.dto.OperationType;
@@ -25,6 +30,7 @@ import com.expense.expense.entity.Account;
 import com.expense.expense.entity.WorkSpace;
 import com.expense.expense.entity.operations.InTransferOperation;
 import com.expense.expense.entity.operations.Operation;
+import com.expense.expense.entity.operations.OutOperation;
 import com.expense.expense.entity.operations.OutTransferOperation;
 import com.expense.expense.mapper.OperationMapper;
 import com.expense.expense.repository.AccountRepository;
@@ -199,6 +205,73 @@ public class AccountOperationService {
         operations.add(operationMapper.operationToOperationDto(destinationOperation));
 
         return operations;
+    }
+
+    private String getMonth(Integer number){
+        String name = "";
+        switch (number) {
+            case 1:
+                name = "January";
+                break;
+            case 2:
+                name = "February";
+                break;
+            case 3:
+                name = "March";
+                break;
+            case 4:
+                name = "April";
+                break;
+            case 5:
+                name = "May";
+                break;
+            case 6:
+                name = "June";
+                break;
+            case 7:
+                name = "July";
+                break;
+            case 8:
+                name = "August";
+                break;
+            case 9:
+                name = "September";
+                break;
+            case 10:
+                name = "October";
+                break;
+            case 11:
+                name = "November";
+                break;
+            case 12:
+                name = "December";
+                break;
+            default:
+                break;
+        }
+        return name;
+    }
+
+    public List<ExpensesByMonthDto> findExpenseByMonth(Integer amountMonths, Integer id){
+        List<ExpensesByMonthDto> totalOutOperationsByDate = new ArrayList<>();
+        LocalDate now = LocalDate.now();
+        LocalDate beginDate = now.minusMonths(amountMonths);
+        
+        LocalDateTime beginDateTime = beginDate.minusDays(1).atStartOfDay();
+        LocalDateTime endDateTime = now.plusDays(1).atStartOfDay();
+        List<Object[]> results = operationRepository.findTotalOutOperationsGroupedByDate(beginDateTime,endDateTime,id);
+        
+         for (Object[] result : results) {
+            Integer year = (Integer)result[1];
+            String month = getMonth((Integer)result[2]);
+            Double sum = (Double) result[0];
+            ExpensesByMonthDto expense = new ExpensesByMonthDto();
+            expense.setDate(year + "-" + month);
+            expense.setExpense(sum);
+            totalOutOperationsByDate.add(expense); 
+        }
+
+        return totalOutOperationsByDate;
     }
 
 }

@@ -1,7 +1,9 @@
 package com.expense.expense.controller;
 
 import java.text.ParseException;
+import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -17,6 +19,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.expense.expense.dto.ExpensesByMonthDto;
 import com.expense.expense.dto.OperationAddDto;
 import com.expense.expense.dto.OperationDto;
 import com.expense.expense.dto.OperationUpdateDto;
@@ -24,6 +27,8 @@ import com.expense.expense.dto.TransferOperationDto;
 import com.expense.expense.dto.validator.OperationDtoValidator;
 import com.expense.expense.service.AccountOperationService;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+
 
 
 
@@ -71,4 +76,11 @@ public class AccountAndOperationController {
         List<OperationDto> operations = accountOperationService.transferMoney(userId, transferOperationDto);
         return new ResponseEntity<>(operations, HttpStatus.OK);
     }
+
+    @GetMapping("/findExpenseByMonth/{userId}")
+    public ResponseEntity<List<ExpensesByMonthDto>> findExpenseByMonth(@PathVariable Integer userId, @RequestParam Integer year) {
+        List<ExpensesByMonthDto> operations = accountOperationService.findExpenseByMonth(year,userId);
+        return new ResponseEntity<>(operations, HttpStatus.OK);
+    }
+    
 }   

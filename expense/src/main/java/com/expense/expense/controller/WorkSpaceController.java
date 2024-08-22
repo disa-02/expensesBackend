@@ -62,7 +62,7 @@ public class WorkSpaceController {
     }
 
     @GetMapping("/list")
-    public ResponseEntity<List<SpaceDto>> getWorkSpace(@RequestParam Integer userId) {
+    public ResponseEntity<List<SpaceDto>> getWorkSpaces(@RequestParam Integer userId) {
         List<SpaceDto> workSpaceDto = workSpaceService.getWorkSpace(userId);
         return new ResponseEntity<>(workSpaceDto,HttpStatus.OK); 
     }
